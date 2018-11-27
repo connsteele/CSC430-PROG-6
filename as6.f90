@@ -2,26 +2,38 @@ program assgn6
 implicit none
 
 ! Interpreter Input Data Type
-TYPE mySexp
+TYPE myExprc
     REAL :: num
     CHARACTER :: char
-END TYPE mySexp
+    LOGICAL :: bool
+    INTEGER :: typeKey !Would be 1 (for Reals), 2 (for Characters), and 3 (for Bools)
+END TYPE myExprc
 
+! Declare the array size for the input
+INTEGER :: arrSize = 3
+TYPE(myExprc),DIMENSION(:),allocatable :: inputArray
 
-INTEGER :: arrSize = 10 ! Size of array created from input
-TYPE(mySexp),DIMENSION(:),allocatable :: inputArray
-
-! Read through the input to find the length of the array
-
-! Allocate memory based on the length and set the elements of the array
 INTEGER :: i
 allocate(inputArray(arrSize))
-do i = 1, arrSize !Loop from 1 to array size
-    inputArray(i)%num = i
-    inputArray(i)%char = 'c'
+inputArray(1)%char = '+'
+inputArray(1)%typeKey = 2
+inputArray(2)%num = 3
+inputArray(1)%typeKey = 1
+inputArray(3)%num = 1
+inputArray(1)%typeKey = 1
+
+print *, inputArray(1)%char
+
+! Loop that reads input array
+
+do i = 0, arrSize
+    if (i == 0 .AND. inputArray(i)%typeKey == 2) then
+        !check for operators here
+    end if 
 end do
-print *, inputArray
 
 deallocate(inputArray)
+
+
 
 end program
