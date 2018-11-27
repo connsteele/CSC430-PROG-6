@@ -9,12 +9,19 @@ TYPE myExprc
     INTEGER :: typeKey !Would be 1 (for Reals), 2 (for Characters), and 3 (for Bools)
 END TYPE myExprc
 
+TYPE myValue
+    REAL :: num
+    CHARACTER :: char
+    LOGICAL :: bool
+    INTEGER :: typeKey !Would be 1 (for Reals), 2 (for Characters), and 3 (for Bools)
+END TYPE myValue
 
 ! Declare the array size for the input
-CHARACTER(10) :: words(5)
 INTEGER :: arrSize = 3
-REAL :: returnVal1 !Interp output value
-REAL :: returnVal2 !Interp output value
+! Vars to hold output of interp
+TYPE(myValue) :: returnVal1
+TYPE(myValue) :: returnVal2
+! Input Arrays to Interp
 TYPE(myExprc),DIMENSION(:),allocatable :: inputArray1
 TYPE(myExprc),DIMENSION(:),allocatable :: inputArray2
 
@@ -37,10 +44,15 @@ inputArray2(3)%typeKey = 1
 returnVal1 = interpret(inputArray1, arrSize)
 returnVal2 = interpret(inputArray2, arrSize)
 
+print *, returnVal1%num
+print *, returnVal2%num
+
 deallocate(inputArray1)
 deallocate(inputArray2)
 
+!----- Functions -----!
 ! Interpreter: Turn myExprc type into myValue type
+<<<<<<< HEAD
 do i = 1, arrSize
     ! Check for Arithmatic Operators
     if (i == 1 .AND. inputArray(i)%typeKey == 2 ) then
@@ -120,38 +132,50 @@ CONTAINS
 		RETURN
 	end function exprC
 	
-	recursive function interpret(inputArray, arrSize)
-      implicit none
-      TYPE(myExprc),DIMENSION(:),allocatable :: inputArray
-      INTEGER :: arrSize 
-      REAL :: interpret
-      INTEGER :: i
-      REAL :: returnVal
+    recursive function interpret(inputArray, arrSize)
+        implicit none
+        TYPE(myExprc),DIMENSION(:),allocatable :: inputArray
+        INTEGER :: arrSize 
+        TYPE(myValue) :: interpret ! what gets returned from the function and its type
+        INTEGER :: i
+        REAL :: returnNum
+        CHARACTER :: returnChar
+        LOGICAL :: returnBool
 
-      do i = 1, arrSize
-         ! Check for Arithmatic Operators
-         if (i == 1 .AND. inputArray(i)%typeKey == 2 ) then
-            ! Check for +
-            if (inputArray(1)%char == '+' .AND. arrSize >= 3) then
-                  returnVal = inputArray(2)%num + inputArray(3)%num
-            else if (inputArray(1)%char == '-' .AND. arrSize >= 3) then
-                  returnVal = inputArray(2)%num - inputArray(3)%num
-            else if (inputArray(1)%char == '*' .AND. arrSize >= 3) then
-                  returnVal = inputArray(2)%num * inputArray(3)%num
-            else if (inputArray(1)%char == '/' .AND. arrSize >= 3 .AND. inputArray(3)%num .NE. 0) then
-                  returnVal = inputArray(2)%num / inputArray(3)%num
+        do i = 1, arrSize
+            if (arrSize == 1) then
+                  if (inputArray(1)%typeKey == 1) then
+                     returnNum = inputArray(1)%num
+                     interpret%typeKey = 1
+                  else if (inputArray(1)%typeKey == 2) then
+                     returnChar = inputArray(1)%char
+                     interpret%typeKey = 2
+                  else if (inputArray(1)%typeKey == 3) then
+                     returnBool = inputArray(1)%bool
+                     interpret%typeKey = 3
+                  endif
+            ! Check for Arithmatic Operators
+         else if (i == 1 .AND. inputArray(i)%typeKey == 2 ) then
+                ! Assign the type key to the return value
+                interpret%typeKey = 1
+                if (inputArray(1)%char == '+' .AND. arrSize >= 3) then
+                        returnNum = inputArray(2)%num + inputArray(3)%num
+                else if (inputArray(1)%char == '-' .AND. arrSize >= 3) then
+                        returnNum = inputArray(2)%num - inputArray(3)%num
+                else if (inputArray(1)%char == '*' .AND. arrSize >= 3) then
+                        returnNum = inputArray(2)%num * inputArray(3)%num
+                else if (inputArray(1)%char == '/' .AND. arrSize >= 3 .AND. inputArray(3)%num .NE. 0) then
+                        returnNum = inputArray(2)%num / inputArray(3)%num
+                else
+                        print *, "Error: No Arithmatic Operator in Input"
+                exit ! exit the do loop once the input has been evaluated
+                endif
             else
-                  print *, "Error: No Arithmatic Operator in Input"
-            endif
-            print *, returnVal ! Print out the return value, change this so it returns instead
-         else
             ! Throw an error here, add else if statements to look for other things
-         end if
-      end do
-
-      interpret = returnVal
-
-   end function interpret
-
+            end if
+        end do
+        interpret%num = returnNum
+        interpret%char = returnChar
+        interpret%bool = returnBool
+    end function interpret
 end program
-
