@@ -11,6 +11,7 @@ END TYPE myExprc
 
 
 ! Declare the array size for the input
+CHARACTER(10) :: words(5)
 INTEGER :: arrSize = 3
 REAL :: returnVal !Interp output value
 TYPE(myExprc),DIMENSION(:),allocatable :: inputArray
@@ -48,15 +49,21 @@ end do
 
 deallocate(inputArray)
 
+
+
+words = word("{ + 2 3")
+
+print *, words
+
 CONTAINS
 	! String to Array function
 	function word (str)
-		CHARACTER(23) :: str
+		CHARACTER(9) :: str
 		CHARACTER(10) :: word(5)
 		
 		INTEGER :: pos1 = 1, pos2, n = 0, i
 		DO
-			pos2 = INDEX(str(pos1:), ",")
+			pos2 = INDEX(str(pos1:), " ")
 			IF (pos2 == 0) THEN
 			   n = n + 1
 			   word(n) = str(pos1:)
