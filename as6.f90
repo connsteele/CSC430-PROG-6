@@ -64,8 +64,19 @@ contains
         LOGICAL :: returnBool
 
         do i = 1, arrSize
+            if (arrSize == 1) then
+                  if (inputArray(1)%typeKey == 1) then
+                     returnNum = inputArray(1)%num
+                     interpret%typeKey = 1
+                  else if (inputArray(1)%typeKey == 2) then
+                     returnChar = inputArray(1)%char
+                     interpret%typeKey = 2
+                  else if (inputArray(1)%typeKey == 3) then
+                     returnBool = inputArray(1)%bool
+                     interpret%typeKey = 3
+                  endif
             ! Check for Arithmatic Operators
-            if (i == 1 .AND. inputArray(i)%typeKey == 2 ) then
+         else if (i == 1 .AND. inputArray(i)%typeKey == 2 ) then
                 ! Assign the type key to the return value
                 interpret%typeKey = 1
                 if (inputArray(1)%char == '+' .AND. arrSize >= 3) then
