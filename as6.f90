@@ -52,7 +52,6 @@ deallocate(inputArray2)
 
 !----- Functions -----!
 ! Interpreter: Turn myExprc type into myValue type
-<<<<<<< HEAD
 do i = 1, arrSize
     ! Check for Arithmatic Operators
     if (i == 1 .AND. inputArray(i)%typeKey == 2 ) then
