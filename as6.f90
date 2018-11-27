@@ -41,7 +41,6 @@ deallocate(inputArray1)
 deallocate(inputArray2)
 
 ! Interpreter: Turn myExprc type into myValue type
-<<<<<<< HEAD
 do i = 1, arrSize
     ! Check for Arithmatic Operators
     if (i == 1 .AND. inputArray(i)%typeKey == 2 ) then
@@ -67,7 +66,7 @@ deallocate(inputArray)
 
 
 
-words = word("{ + 2 3")
+words = word("{ + 2 3 }")
 
 print *, words
 
@@ -96,6 +95,30 @@ CONTAINS
 			
 
 	end function word
+	
+	function exprC (inp, inpSize)
+		CHARACTER(10) :: inp(5)
+		INTEGER :: inpSize
+		TYPE(myExprc),DIMENSION(:),allocatable :: exprC
+		INTEGER :: i
+		allocate(exprC(inpSize - 2))
+		do i = 2, inpSize - 1
+			if (inp(i) == 'F') then
+				exprC(i-1)%logical = .FALSE.
+				exprC(i-1)%typeKey = 3
+			else if (inp(i) == 'T') then
+				exprC(i-1)%logical = .TRUE.
+				exprC(i-1)%typeKey = 3
+			else if (inp(i) > '0' .AND. inp(i) < '9') then
+				read(str , *) exprC(i-1)%num 
+				exprC(i-1)%typeKey = 1
+			else
+				exprC(i-1)%char = inp(i)
+				exprC(i-1)%typeKey = 2
+			end if
+		end do
+		RETURN
+	end function exprC
 	
 	recursive function interpret(inputArray, arrSize)
       implicit none
