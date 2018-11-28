@@ -18,12 +18,14 @@ END TYPE myValue
 
 ! Declare the array size for the input
 INTEGER :: arrSize = 3
+CHARACTER(10) :: words(5)
 ! Vars to hold output of interp
 TYPE(myValue) :: returnVal1
 TYPE(myValue) :: returnVal2
 ! Input Arrays to Interp
 TYPE(myExprc),DIMENSION(:),allocatable :: inputArray1
 TYPE(myExprc),DIMENSION(:),allocatable :: inputArray2
+TYPE(myExprc),DIMENSION(:),allocatable :: inputArray3
 
 allocate(inputArray1(arrSize))
 inputArray1(1)%char = '+'
@@ -50,36 +52,12 @@ print *, returnVal2%num
 deallocate(inputArray1)
 deallocate(inputArray2)
 
-!----- Functions -----!
-! Interpreter: Turn myExprc type into myValue type
-do i = 1, arrSize
-    ! Check for Arithmatic Operators
-    if (i == 1 .AND. inputArray(i)%typeKey == 2 ) then
-        ! Check for +
-        if (inputArray(1)%char == '+' .AND. arrSize >= 3) then
-            returnVal = inputArray(2)%num + inputArray(3)%num
-        else if (inputArray(1)%char == '-' .AND. arrSize >= 3) then
-            returnVal = inputArray(2)%num - inputArray(3)%num
-        else if (inputArray(1)%char == '*' .AND. arrSize >= 3) then
-            returnVal = inputArray(2)%num * inputArray(3)%num
-        else if (inputArray(1)%char == '/' .AND. arrSize >= 3 .AND. inputArray(3)%num .NE. 0) then
-            returnVal = inputArray(2)%num / inputArray(3)%num
-        else
-            print *, "Error: No Arithmatic Operator in Input"
-        endif
-        print *, returnVal ! Print out the return value, change this so it returns instead
-    else
-        ! Throw an error here, add else if statements to look for other things
-    end if
-end do
-
-deallocate(inputArray)
-
-
 
 words = word("{ + 2 3 }")
 
-print *, words
+inputArray3 = exprC(words,5)
+
+print *, inputArray3(1)%char
 
 CONTAINS
 	! String to Array function
@@ -115,13 +93,13 @@ CONTAINS
 		allocate(exprC(inpSize - 2))
 		do i = 2, inpSize - 1
 			if (inp(i) == 'F') then
-				exprC(i-1)%logical = .FALSE.
+				exprC(i-1)%bool = .FALSE.
 				exprC(i-1)%typeKey = 3
 			else if (inp(i) == 'T') then
-				exprC(i-1)%logical = .TRUE.
+				exprC(i-1)%bool = .TRUE.
 				exprC(i-1)%typeKey = 3
 			else if (inp(i) > '0' .AND. inp(i) < '9') then
-				read(str , *) exprC(i-1)%num 
+				read(inp(i) , *) exprC(i-1)%num 
 				exprC(i-1)%typeKey = 1
 			else
 				exprC(i-1)%char = inp(i)
