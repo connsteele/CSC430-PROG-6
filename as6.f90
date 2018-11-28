@@ -18,7 +18,7 @@ program assgn6
     
     ! Declare the array size for the input
     INTEGER :: arrSize = 3
-    CHARACTER(10) :: words(5)
+    CHARACTER(1) :: words(5)
     !Var to hold output of serialize
     CHARACTER(len = 1024) :: serialVal
     ! Input Arrays to Interp
@@ -26,46 +26,61 @@ program assgn6
     
     
     !---- Test Cases ----!
-    words = word("{ + 2 3 }")
+    !words = word("{ + 2 3 }")
+    words = (/'{','+', '2', '3','}'/)
     inputArray = exprC(words,5)
     serialVal = serialize(interpret(inputArray, 3))
-    print *,serialVal
+    print *,words,serialVal
 
-    words = word("{ - 2 3 }")
+    !words = word("{ - 2 3 }")
+    words = (/'{','-', '2', '3','}'/)
     inputArray = exprC(words,5)
     serialVal = serialize(interpret(inputArray, 3))
-    print *,serialVal
+    print *,words,serialVal
+    
+    words = (/'{','/', '2', '3','}'/)
+    inputArray = exprC(words,5)
+    serialVal = serialize(interpret(inputArray, 3))
+    print *,words,serialVal
+    
+    words = (/'{','*', '2', '3','}'/)
+    inputArray = exprC(words,5)
+    serialVal = serialize(interpret(inputArray, 3))
+    print *,words,serialVal
 
 
     
     CONTAINS
         ! String to Array function
-        function word (str)
-            CHARACTER(9) :: str
-            CHARACTER(10) :: word(5)
-            
-            INTEGER :: pos1 = 1, pos2, n = 0, i
-            DO
-                pos2 = INDEX(str(pos1:), " ")
-                IF (pos2 == 0) THEN
-                   n = n + 1
-                   word(n) = str(pos1:)
-                   EXIT
-                END IF
-                n = n + 1
-                word(n) = str(pos1:pos1+pos2-2)
-                pos1 = pos2+pos1
-            END DO
-            DO i = 1, n
-                WRITE(*,"(2A)", ADVANCE="NO") TRIM(word(i)), "."
-            END DO
-            RETURN 
+        !function word (str)
+        !    CHARACTER(9) :: str
+        !    CHARACTER, dimension(:,:),allocatable :: word
+        !    
+        !    INTEGER :: pos1 = 1, pos2, n = 0, i, j
+        !    allocate (word(3,5))
+        !    DO
+        !        pos2 = INDEX(str(pos1:), " ")
+        !        IF (pos2 == 0) THEN
+        !           n = n + 1
+        !           DO j = 1, pos2
+	!					word(n,1) = str(pos1)
+	!			   END DO
+     !              EXIT
+      !          END IF
+       !         n = n + 1
+        !        word(n,1) = str(pos1:)
+         !       pos1 = pos2+pos1
+          !  END DO
+            !DO i = 1, n
+            !    WRITE(*,"(2A)", ADVANCE="NO") TRIM(word(i)), "."
+            !END DO
+           ! RETURN 
                 
     
-        end function word
+       ! end function word
         
         function exprC (inp, inpSize)
-            CHARACTER(10) :: inp(5)
+            CHARACTER(1) :: inp(3)
             INTEGER :: inpSize
             TYPE(myExprc),DIMENSION(:),allocatable :: exprC
             INTEGER :: i
