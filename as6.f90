@@ -19,48 +19,24 @@ program assgn6
     ! Declare the array size for the input
     INTEGER :: arrSize = 3
     CHARACTER(10) :: words(5)
-    ! Vars to hold output of interp
-    TYPE(myValue) :: returnVal1
-    TYPE(myValue) :: returnVal2
+    !Var to hold output of serialize
+    CHARACTER(len = 1024) :: serialVal
     ! Input Arrays to Interp
-    TYPE(myExprc),DIMENSION(:),allocatable :: inputArray1
-    TYPE(myExprc),DIMENSION(:),allocatable :: inputArray2
-    TYPE(myExprc),DIMENSION(:),allocatable :: inputArray3
-    
-    allocate(inputArray1(arrSize))
-    inputArray1(1)%char = '+'
-    inputArray1(1)%typeKey = 2
-    inputArray1(2)%num = 3
-    inputArray1(2)%typeKey = 1
-    inputArray1(3)%num = 1
-    inputArray1(3)%typeKey = 1
-    
-    allocate(inputArray2(arrSize))
-    inputArray2(1)%char = '-'
-    inputArray2(1)%typeKey = 2
-    inputArray2(2)%num = 3
-    inputArray2(2)%typeKey = 1
-    inputArray2(3)%num = 1
-    inputArray2(3)%typeKey = 1
-    
-    returnVal1 = interpret(inputArray1, arrSize)
-    returnVal2 = interpret(inputArray2, arrSize)
-
-    serialize(returnVal1)
-    serialize(returnVal2)
-    
-    print *, returnVal1%num
-    print *, returnVal2%num
-    
-    deallocate(inputArray1)
-    deallocate(inputArray2)
+    TYPE(myExprc),DIMENSION(:),allocatable :: inputArray
     
     
+    !---- Test Cases ----!
     words = word("{ + 2 3 }")
-    
-    inputArray3 = exprC(words,5)
-    
-    print *, inputArray3(1)%char
+    inputArray = exprC(words,5)
+    serialVal = serialize(interpret(inputArray, 3))
+    print *,serialVal
+
+    words = word("{ - 2 3 }")
+    inputArray = exprC(words,5)
+    serialVal = serialize(interpret(inputArray, 3))
+    print *,serialVal
+
+
     
     CONTAINS
         ! String to Array function
@@ -159,6 +135,7 @@ program assgn6
             interpret%bool = returnBool
         end function interpret
 
+        ! Turn the input into a string and print it to the console
         function serialize(inp)
             implicit none
             TYPE(myValue) :: inp
@@ -167,13 +144,10 @@ program assgn6
     
             if (inp%typeKey == 1) then
                 write(outstr, *) inp%num
-                print *, inp%num
             else if (inp%typeKey == 2) then
                 write(outstr, *) inp%char
-                print *, inp%char
             else if (inp%typeKey == 3) then
                 write(outstr, *) inp%bool
-                print *, inp%bool
             else
                 serialize = "Error"
                 print *, "Error! Type Key doesn't match existing Type"
