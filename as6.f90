@@ -5,8 +5,9 @@ implicit none
 TYPE myExprc
     REAL :: num
     CHARACTER :: char
+    CHARACTER(2) :: char2
     LOGICAL :: bool
-    INTEGER :: typeKey !Would be 1 (for Reals), 2 (for Characters), and 3 (for Bools)
+    INTEGER :: typeKey !Would be 1 (for Reals), 2 (for Characters), 3 (for Bools), 4 for logicals of size 2
 END TYPE myExprc
 
 TYPE myValue
@@ -28,7 +29,7 @@ TYPE(myExprc),DIMENSION(:),allocatable :: inputArray
 
 !---- Test Cases ----!
 words = (/'{','+', '2', '3','}'/)
-inputArray = exprC(words,5)
+inputArray = exprC(words,5,1)
 serialVal = serialize(interpret(inputArray, 3))
 print *,"ExprC Input to interpret: ",words
 print *,"Actual Output: ",serialVal
@@ -36,7 +37,7 @@ print *,"Exptected Output: 5.00000"
 print *,""
 
 words = (/'{','-', '2', '3','}'/)
-inputArray = exprC(words,5)
+inputArray = exprC(words,5,1)
 serialVal = serialize(interpret(inputArray, 3))
 print *,"ExprC Input to interpret: ",words
 print *,"Actual Output: ",serialVal
@@ -44,7 +45,7 @@ print *,"Exptected Output: -1.00000"
 print *,""
 
 words = (/'{','/', '6', '3','}'/)
-inputArray = exprC(words,5)
+inputArray = exprC(words,5,1)
 serialVal = serialize(interpret(inputArray, 3))
 print *,"ExprC Input to interpret: ",words
 print *,"Actual Output: ",serialVal
@@ -52,7 +53,7 @@ print *,"Exptected Output: 2.00000"
 print *,""
 
 words = (/'{','*', '2', '3','}'/)
-inputArray = exprC(words,5)
+inputArray = exprC(words,5,1)
 serialVal = serialize(interpret(inputArray, 3))
 print *,"ExprC Input to interpret: ",words
 print *,"Actual Output: ",serialVal
@@ -60,7 +61,7 @@ print *,"Exptected Output: 6.00000"
 print *,""
 
 words = (/'{','<', '2', '3','}'/)
-inputArray = exprC(words,5)
+inputArray = exprC(words,5,1)
 serialVal = serialize(interpret(inputArray, 3))
 print *,"ExprC Input to interpret: ",words
 print *,"Actual Output: ",serialVal
@@ -68,7 +69,7 @@ print *,"Exptected Output: T"
 print *,""
 
 words = (/'{','>', '2', '3','}'/)
-inputArray = exprC(words,5)
+inputArray = exprC(words,5,1)
 serialVal = serialize(interpret(inputArray, 3))
 print *,"ExprC Input to interpret: ",words
 print *,"Actual Output: ",serialVal
@@ -76,7 +77,7 @@ print *,"Exptected Output: F"
 print *,""
 
 single = (/'{','4','}'/)
-inputArray = exprC(single,3)
+inputArray = exprC(single,3,1)
 serialVal = serialize(interpret(inputArray, 1))
 print *,"ExprC Input to interpret: ",single
 print *,"Actual Output: ",serialVal
@@ -84,7 +85,7 @@ print *,"Exptected Output: 4.00000"
 print *,""
 
 single = (/'{','a','}'/)
-inputArray = exprC(single,3)
+inputArray = exprC(single,3,1)
 serialVal = serialize(interpret(inputArray, 1))
 print *,"ExprC Input to interpret: ",single
 print *,"Actual Output: ",serialVal
@@ -92,57 +93,65 @@ print *,"Exptected Output: a"
 print *,""
 
 !--- Test Cases that won't work, but are have some code in interp ---!
-! logicWord = (/'{','>=', '2', '3','}'/)
-! inputArray = exprC(logicWord,5)
-! serialVal = serialize(interpret(inputArray, 3))
-! print *,"ExprC Input to interpret: ",logicWord
-! print *,"Actual Output: ",serialVal
-! print *,"Exptected Output: F"
+ logicWord = (/'{ ','>=', ' 2', ' 3',' }'/)
+ inputArray = exprC(logicWord,5,2)
+ serialVal = serialize(interpret(inputArray, 3))
+ print *,"ExprC Input to interpret: ",logicWord
+ print *,"Actual Output: ",serialVal
+ print *,"Exptected Output: F"
+ print *,""
 
-! logicWord = (/'{','<=', '2', '3','}'/)
-! inputArray = exprC(logicWord,5)
-! serialVal = serialize(interpret(inputArray, 3))
-! print *,"ExprC Input to interpret: ",logicWord
-! print *,"Actual Output: ",serialVal
-! print *,"Exptected Output: T"
+ logicWord = (/'{ ','<=', '2 ', '3 ',' }'/)
+ inputArray = exprC(logicWord,5,2)
+ serialVal = serialize(interpret(inputArray, 3))
+ print *,"ExprC Input to interpret: ",logicWord
+ print *,"Actual Output: ",serialVal
+ print *,"Exptected Output: T"
+ print *,""
 
-! logicWord = (/'{','==', '2', '3','}'/)
-! inputArray = exprC(logicWord,5)
-! serialVal = serialize(interpret(inputArray, 3))
-! print *,"ExprC Input to interpret: ",logicWord
-! print *,"Actual Output: ",serialVal
-! print *,"Exptected Output: F"
+ logicWord = (/'{ ','==', '2 ', '3 ',' }'/)
+ inputArray = exprC(logicWord,5,2)
+ serialVal = serialize(interpret(inputArray, 3))
+ print *,"ExprC Input to interpret: ",logicWord
+ print *,"Actual Output: ",serialVal
+ print *,"Exptected Output: F"
+ print *,""
 
-! logicWord = (/'{','/=', '2', '3','}'/) ! /= is not equal in fortran
-! inputArray = exprC(logicWord,5)
-! serialVal = serialize(interpret(inputArray, 3))
-! print *,"ExprC Input to interpret: ",logicWord
-! print *,"Actual Output: ",serialVal
-! print *,"Exptected Output: T"
+ logicWord = (/'{ ','/=', '2 ', '3 ',' }'/) ! /= is not equal in fortran
+ inputArray = exprC(logicWord,5,2)
+ serialVal = serialize(interpret(inputArray, 3))
+ print *,"ExprC Input to interpret: ",logicWord
+ print *,"Actual Output: ",serialVal
+ print *,"Exptected Output: T"
+ print *,""
 
 
 !---- Functions ----!
 CONTAINS
     ! Transform input
-    function exprC (inp, inpSize)
-        CHARACTER(1) :: inp(3)
+    function exprC (inp, inpSize,s)
+		INTEGER :: s
+        CHARACTER(s) :: inp(3)
         INTEGER :: inpSize
         TYPE(myExprc),DIMENSION(:),allocatable :: exprC
         INTEGER :: i
         allocate(exprC(inpSize - 2))
         do i = 2, inpSize - 1
-            if (inp(i) == 'F') then
+            if (trim(inp(i)) == 'F') then
                 exprC(i-1)%bool = .FALSE.
                 exprC(i-1)%typeKey = 3
-            else if (inp(i) == 'T') then
+            else if (trim(inp(i))== 'T') then
                 exprC(i-1)%bool = .TRUE.
                 exprC(i-1)%typeKey = 3
-            else if (inp(i) > '0' .AND. inp(i) < '9') then
-                read(inp(i) , *) exprC(i-1)%num 
+            else if (trim(inp(i)) > '0' .AND. trim(inp(i)) < '9') then
+                read(inp(i) , *) exprC(i-1)%num
                 exprC(i-1)%typeKey = 1
-            else
+            else if (s == 1) then
                 exprC(i-1)%char = inp(i)
                 exprC(i-1)%typeKey = 2
+            else
+				exprC(i-1)%char2 = inp(i)
+                exprC(i-1)%typeKey = 4
             end if
         end do
         RETURN
@@ -187,23 +196,28 @@ CONTAINS
                 else if (inputArray(1)%char == '/' .AND. arrSize >= 3 .AND. inputArray(3)%num .NE. 0) then
                         returnNum = inputArray(2)%num / inputArray(3)%num
                         interpret%typeKey = 1
-                ! Check for Logical Operators
                 else if (inputArray(1)%char == '>' .AND. arrSize >= 3) then
-                    interpret%typeKey = 3
-                    returnBool = inputArray(2)%num > inputArray(3)%num
-                else if (inputArray(1)%char == '>=' .AND. arrSize >= 3) then
+						interpret%typeKey = 3
+						returnBool = inputArray(2)%num > inputArray(3)%num
+				else if (inputArray(1)%char == '<' .AND. arrSize >= 3) then
+						interpret%typeKey = 3
+						returnBool = inputArray(2)%num < inputArray(3)%num
+				else
+                        print *, "Error: No Arithmatic Operator in Input"
+                exit ! exit the do loop once the input has been evaluated
+                endif
+            else if (i == 1 .AND. inputArray(i)%typeKey == 4 ) then
+                ! Check for Logical Operators
+                if (inputArray(1)%char2 == '>=' .AND. arrSize >= 3) then
                     interpret%typeKey = 3
                     returnBool = inputArray(2)%num >= inputArray(3)%num
-                else if (inputArray(1)%char == '<' .AND. arrSize >= 3) then
-                    interpret%typeKey = 3
-                    returnBool = inputArray(2)%num < inputArray(3)%num
-                else if (inputArray(1)%char == '<=' .AND. arrSize >= 3) then
+                else if (inputArray(1)%char2 == '<=' .AND. arrSize >= 3) then
                     interpret%typeKey = 3
                     returnBool = inputArray(2)%num <= inputArray(3)%num
-                else if (inputArray(1)%char == '==' .AND. arrSize >= 3) then
+                else if (inputArray(1)%char2 == '==' .AND. arrSize >= 3) then
                     interpret%typeKey = 3
                     returnBool = inputArray(2)%num == inputArray(3)%num
-                else if (inputArray(1)%char == '/=' .AND. arrSize >= 3) then
+                else if (inputArray(1)%char2 == '/=' .AND. arrSize >= 3) then
                     interpret%typeKey = 3
                     returnBool = inputArray(2)%num /= inputArray(3)%num
                 else
